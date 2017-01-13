@@ -4,7 +4,6 @@ import List from '../models/list';
 class ListController extends BaseController {
   constructor() {
     super();
-    
     this.search = this.search.bind(this);
     this.fetch = this.fetch.bind(this);
     this.create = this.create.bind(this);
@@ -13,6 +12,7 @@ class ListController extends BaseController {
    // Middleware to populate list based on url param
   _populate(req, res, next) {
     List.findById(req.params.listId)
+      .populate('_user')
       .then((list) => {
         if (!list) {
           return res.status(404).json({ message: 'List not found.' });
@@ -49,8 +49,6 @@ class ListController extends BaseController {
    */
 
   create(req, res) {
-    console.log('req.body');
-    console.log(req.body);
     const list = new List(req.body);
     list._user = req.currentUser._id;
     list.save()
