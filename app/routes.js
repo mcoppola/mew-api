@@ -5,6 +5,7 @@ import AuthController from './controllers/auth.controller';
 import UsersController from './controllers/users.controller';
 // import PostsController from './controllers/posts.controller';
 import ListsController from './controllers/lists.controller';
+import AlbumsController from './controllers/albums.controller';
 
 import authenticate from './middleware/authenticate';
 import constants from './config/constants';
@@ -36,5 +37,11 @@ routes.get(`${prefix}/lists`, ListsController.search);
 routes.post(`${prefix}/lists`, authenticate, ListsController.create);
 routes.get(`${prefix}/lists/:listId`, ListsController._populate, ListsController.fetch);
 routes.delete(`${prefix}/lists/:listId`, authenticate, ListsController.delete);
+
+// Album
+routes.get(`${prefix}/albums`, AlbumsController.search);
+routes.post(`${prefix}/albums`, authenticate, AlbumsController.create);
+routes.get(`${prefix}/albums/:albumId`, AlbumsController._populate, AlbumsController.fetch);
+routes.delete(`${prefix}/albums/:albumId`, authenticate, AlbumsController.delete);
 
 export default routes;

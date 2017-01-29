@@ -45,7 +45,7 @@ const defaultConfig = {
 const environmentConfigs = {
   development: {
     mongo: {
-      uri: process.env.MONGO_URI || 'mongodb://localhost/development',
+      uri: process.env.MONGO_URI || 'mongodb://localhost/mew-dev',
     },
     security: {
       saltRounds: 4,
@@ -54,7 +54,7 @@ const environmentConfigs = {
   test: {
     port: 5678,
     mongo: {
-      uri: process.env.MONGO_URI || 'mongodb://localhost/test',
+      uri: process.env.MONGO_URI || 'mongodb://localhost/mew-test',
     },
     security: {
       saltRounds: 4,

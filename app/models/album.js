@@ -1,15 +1,17 @@
 import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
-const ListSchema = new Schema({
+const AlbumSchema = new Schema({
   title: {
     type: String,
     required: true,
   },
-  albums: {
-    type: [
-      { type: Schema.Types.ObjectId, ref: 'Album' }
-    ],
+  artist: {
+    type: String,
+    required: true,
+  },
+  mbid: {
+    type: [String],
     required: true,
   },
    _user: { type: Schema.Types.ObjectId, ref: 'User' },
@@ -17,6 +19,6 @@ const ListSchema = new Schema({
   timestamps: true,
 });
 
-const ListModel = mongoose.model('List', ListSchema);
+const AlbumModel = mongoose.model('Album', AlbumSchema);
 
-export default ListModel;
+export default AlbumModel;
