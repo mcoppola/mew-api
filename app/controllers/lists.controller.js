@@ -13,6 +13,7 @@ class ListController extends BaseController {
   _populate(req, res, next) {
     List.findById(req.params.listId)
       .populate('_user')
+      .populate('_albums')
       .then((list) => {
         if (!list) {
           return res.status(404).json({ message: 'List not found.' });
@@ -28,6 +29,7 @@ class ListController extends BaseController {
     List
       .find({})
       .populate({ path: '_user', select: '-lists -role' })
+      .populate('_albums')
       .then((lists) => {
         res.status(200).json(lists);
       })

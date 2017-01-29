@@ -10,8 +10,12 @@ const AlbumSchema = new Schema({
     type: String,
     required: true,
   },
-  mbid: {
+  image: {
     type: [String],
+    required: false
+  },
+  mbid: {
+    type: String,
     required: true,
   },
    _user: { type: Schema.Types.ObjectId, ref: 'User' },

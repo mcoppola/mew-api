@@ -3,7 +3,6 @@ import { Router } from 'express';
 import MetaController from './controllers/meta.controller';
 import AuthController from './controllers/auth.controller';
 import UsersController from './controllers/users.controller';
-// import PostsController from './controllers/posts.controller';
 import ListsController from './controllers/lists.controller';
 import AlbumsController from './controllers/albums.controller';
 
@@ -25,12 +24,6 @@ routes.get(`${prefix}/users/me`, authenticate, UsersController.fetch);
 routes.put(`${prefix}/users/me`, authenticate, UsersController.update);
 routes.delete(`${prefix}/users/me`, authenticate, UsersController.delete);
 routes.get(`${prefix}/users/:username`, UsersController._populate, UsersController.fetch)
-
-// Post
-// routes.get(`${prefix}/posts`, PostsController.search);
-// routes.post(`${prefix}/posts`, authenticate, PostsController.create);
-// routes.get(`${prefix}/posts/:postId`, PostsController._populate, PostsController.fetch);
-// routes.delete(`${prefix}/posts/:postId`, authenticate, PostsController.delete);
 
 // List
 routes.get(`${prefix}/lists`, ListsController.search);

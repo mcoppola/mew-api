@@ -6,7 +6,7 @@ const ListSchema = new Schema({
     type: String,
     required: true,
   },
-  albums: {
+  _albums: {
     type: [
       { type: Schema.Types.ObjectId, ref: 'Album' }
     ],
