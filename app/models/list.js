@@ -17,6 +17,9 @@ const ListSchema = new Schema({
   timestamps: true,
 });
 
+// User + title are unique
+ListSchema.index({ title: 1, _user: 1 }, { unique: true });
+
 const ListModel = mongoose.model('List', ListSchema);
 
 export default ListModel;
