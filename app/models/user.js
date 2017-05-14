@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import Post from './post';
 import Constants from '../config/Constants';
 
 const Schema = mongoose.Schema;
@@ -104,10 +103,6 @@ UserSchema
  * User Methods
  */
 UserSchema.methods = {
-  getPosts() {
-    return Post.find({ _user: this._id });
-  },
-
   /**
    * Authenticate - check if the passwords are the same
    * @public

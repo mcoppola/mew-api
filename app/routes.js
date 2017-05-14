@@ -5,6 +5,8 @@ import AuthController from './controllers/auth.controller';
 import UsersController from './controllers/users.controller';
 import ListsController from './controllers/lists.controller';
 import AlbumsController from './controllers/albums.controller';
+import AlbumPointController from './controllers/albumPoint.controller';
+
 
 import authenticate from './middleware/authenticate';
 import constants from './config/constants';
@@ -36,5 +38,9 @@ routes.get(`${prefix}/albums`, AlbumsController.search);
 routes.post(`${prefix}/albums`, authenticate, AlbumsController.create);
 routes.get(`${prefix}/albums/:albumId`, AlbumsController._populate, AlbumsController.fetch);
 routes.delete(`${prefix}/albums/:albumId`, authenticate, AlbumsController.delete);
+
+// Album Points
+routes.post(`${prefix}/points`, authenticate, AlbumPointController.create);
+
 
 export default routes;

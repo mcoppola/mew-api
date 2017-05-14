@@ -1,5 +1,6 @@
 import BaseController from './base.controller';
 import Album from '../models/album';
+import * as R from 'ramda';
 
 class AlbumController extends BaseController {
   constructor() {
@@ -9,27 +10,40 @@ class AlbumController extends BaseController {
     this.create = this.create.bind(this);
     this.delete = this.delete.bind(this);
   }
-   // Middleware to populate list based on url param
+   // Middleware to populate album based on url param
   _populate(req, res, next) {
-    Album.findById(req.params.listId)
+    Album.findById(req.params.albumId)
       .populate('_user')
-      .then((list) => {
-        if (!list) {
+      .then((album) => {
+        if (!album) {
           return res.status(404).json({ message: 'Album not found.' });
         }
-
-        req.list = list;
+        req.album = album;
         next();
       })
       .catch(() => res.sendStatus(400));
+  }
+
+  getPoints (album) {
+    return new Promise((resolve, reject) => {
+      album.getPoints()
+        .then(p => {
+          album._doc.points = p
+          return resolve(album)
+        })
+        .catch(reject)
+    })
   }
 
   search = (req, res) => {
     Album
       .find({})
       .populate({ path: '_user', select: '-album -role' })
-      .then((album) => {
-        res.status(200).json(album);
+      .then((albums) => {
+        Promise.all(R.map(this.getPoints, albums))
+          .then((withPoints) => {
+            res.status(200).json(withPoints);
+          })
       })
       .catch((err) => {
         res.status(500).json(this.formatApiError(err));
@@ -37,11 +51,11 @@ class AlbumController extends BaseController {
   }
 
   /**
-  * req.list is populated by middleware in routes.js
+  * req.album is populated by middleware in routes.js
    */
 
   fetch(req, res) {
-    res.json(req.list);
+    res.json(req.album);
   }
 
   /**
@@ -49,9 +63,9 @@ class AlbumController extends BaseController {
    */
 
   create(req, res) {
-    const list = new Album(req.body);
-    list._user = req.currentUser._id;
-    list.save()
+    const album = new Album(req.body);
+    album._user = req.currentUser._id;
+    album.save()
       .then((p) => {
         res.json(p);
       })
@@ -60,10 +74,11 @@ class AlbumController extends BaseController {
       });
   }
 
+
   delete(req, res) {
     // toString is necessary to convert ObjectIDs to normal Strings
-    if (req.list._user.toString() === req.currentUser._id.toString()) {
-      req.list.remove()
+    if (req.album._user.toString() === req.currentUser._id.toString()) {
+      req.album.remove()
         .then(() => {
           res.sendStatus(204);
         })
