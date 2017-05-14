@@ -1,9 +1,7 @@
 import BaseController from './base.controller';
 import AlbumPoint from '../models/albumPoint';
+import points from '../config/points';
 
-const values = {
-  'upvote': 1
-}
 
 class AlbumPointController extends BaseController {
   constructor() {
@@ -18,7 +16,7 @@ class AlbumPointController extends BaseController {
   create(req, res) {
     const albumPoint = new AlbumPoint(req.body);
     albumPoint._user = req.currentUser._id;
-    albumPoint.value = values[albumPoint.action]
+    albumPoint.value = points.values[albumPoint.action]
 
     albumPoint.save()
       .then((p) => {

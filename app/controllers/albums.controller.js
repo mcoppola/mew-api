@@ -28,7 +28,7 @@ class AlbumController extends BaseController {
     return new Promise((resolve, reject) => {
       album.getPoints()
         .then(p => {
-          album._doc.points = p
+          album._doc = R.merge(album._doc, p)
           return resolve(album)
         })
         .catch(reject)
@@ -40,6 +40,7 @@ class AlbumController extends BaseController {
       .find({})
       .populate({ path: '_user', select: '-album -role' })
       .then((albums) => {
+        // merge albums with point sums
         Promise.all(R.map(this.getPoints, albums))
           .then((withPoints) => {
             res.status(200).json(withPoints);

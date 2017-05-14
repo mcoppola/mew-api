@@ -1,8 +1,9 @@
-import mongoose from 'mongoose';
-import AlbumPoint from './albumPoint';
-import * as R from 'ramda';
+import mongoose from 'mongoose'
+import AlbumPoint from './albumPoint'
+import * as R from 'ramda'
+import points from '../config/points'
 
-const Schema = mongoose.Schema;
+const Schema = mongoose.Schema
 
 const AlbumSchema = new Schema({
   title: {
@@ -25,7 +26,21 @@ const AlbumSchema = new Schema({
   _user: { type: Schema.Types.ObjectId, ref: 'User' },
 }, {
   timestamps: true,
-});
+})
+
+/**
+ * Album 'now' Points calculation
+ */
+const pointsNow =
+  R.pipe(
+    R.filter(p => {
+      let timestamp = new Date(p.createdAt)
+      let cutoff = Date.now() - points.time.upvote
+      return timestamp.getTime() >= cutoff
+    }),
+    R.pluck('value'),
+    R.sum
+  )
 
 /**
  * Album Methods
@@ -35,16 +50,20 @@ AlbumSchema.methods = {
     return new Promise((resolve, reject) => {
       AlbumPoint
       .find({ album: this._id })
-      .then(points => {
-        let sum = R.sum(R.pluck('value', points))
-        return resolve(sum);
-      })
+      .then(points => 
+        resolve({ 
+          // total points 
+          pointsTotal: R.sum(R.pluck('value', points)),
+          // weighted "now" points
+          pointsNow: pointsNow(points)
+        })
+      )
       .catch(reject)
     })
   }
 }
 
 
-const AlbumModel = mongoose.model('Album', AlbumSchema);
+const AlbumModel = mongoose.model('Album', AlbumSchema)
 
 export default AlbumModel;
