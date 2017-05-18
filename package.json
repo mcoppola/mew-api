@@ -1,7 +1,7 @@
 {
-  "name": "node-rest-api-boilerplate",
+  "name": "mew-api",
   "version": "0.7.4",
-  "description": "Boilerplate project for a restful node backend server powered by ES6 and Express",
+  "description": "Mew API",
   "main": "index.js",
   "scripts": {
     "build": "npm run clean && babel app -d build",

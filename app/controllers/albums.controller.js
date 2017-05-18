@@ -37,13 +37,19 @@ class AlbumController extends BaseController {
 
   search = (req, res) => {
     Album
-      .find({})
+      .find({}, { skip: req.query.skip*10 || 0 })
       .populate({ path: '_user', select: '-album -role' })
       .then((albums) => {
         // merge albums with point sums
         Promise.all(R.map(this.getPoints, albums))
           .then((withPoints) => {
-            res.status(200).json(withPoints);
+
+            // sort and apply limit
+            let topAlbums = R.reverse(
+                            R.sortBy(R.prop('pointsNow'), withPoints))
+                            .slice(0, req.query.limit || 10)
+
+            res.status(200).json(topAlbums);
           })
       })
       .catch((err) => {

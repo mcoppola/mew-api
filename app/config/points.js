@@ -7,7 +7,7 @@ const pointsConfig = {
 	},
 
 	time: {
-		'upvote': 1000*60*5 // 5 min
+		'upvote': 1000*60*60*24 // 1 day
 	}
 
 }
