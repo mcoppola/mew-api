@@ -20,13 +20,21 @@ const AlbumSchema = new Schema({
   },
   mbid: {
     type: String,
-    required: true,
-    unique: true
+    required: false,
+    unqiue: true
+  },
+  fmUrl: {
+    type: String,
+    required: false,
+    unqiue: true
   },
   _user: { type: Schema.Types.ObjectId, ref: 'User' },
 }, {
   timestamps: true,
 })
+
+// Title + Artist are unique
+AlbumSchema.index({ title: 1, artist: 1 }, { unique: true });
 
 /**
  * Album 'now' Points calculation
