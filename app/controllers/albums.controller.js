@@ -37,7 +37,7 @@ class AlbumController extends BaseController {
 
   search = (req, res) => {
     Album
-      .find({}, { skip: req.query.skip*10 || 0 })
+      .find(req.query.q ? JSON.parse(req.query.q) : {}, { skip: req.query.skip*10 || 0 })
       .populate({ path: '_user', select: '-album -role' })
       .then((albums) => {
         // merge albums with point sums
