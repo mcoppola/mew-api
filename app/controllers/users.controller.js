@@ -10,7 +10,7 @@ class UsersController extends BaseController {
     this.update = this.update.bind(this);
     this.delete = this.delete.bind(this);
 
-    this.whitelist = ['firstname', 'lastname', 'email', 'username', 'password'];
+    this.whitelist = ['firstname', 'lastname', 'email', 'username', 'password', 'spotifyAccess', 'spotifyRefresh'];
   }
 
   _populate(req, res, next) {
@@ -72,8 +72,7 @@ class UsersController extends BaseController {
 
     const params = this.filterParams(req.body, this.whitelist);
 
-    const updated = Object.assign({}, req.currentUser, params);
-    updated.save()
+    User.update({ _id: req.currentUser._id }, params)
       .then(() => {
         res.sendStatus(204);
       })

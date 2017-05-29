@@ -34,6 +34,13 @@ const UserSchema = new Schema({
     type: String,
     default: 'user',
   },
+  // SPOTIFY TOKENS
+  spotifyRefresh: {
+    type: String
+  },
+  spotifyAccess: {
+    type: String
+  }
 }, {
   timestamps: true,
 });

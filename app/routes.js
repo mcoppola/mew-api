@@ -18,6 +18,7 @@ routes.get(`${prefix}/`, MetaController.index);
 
 // Authentication
 routes.post(`${prefix}/auth/login`, AuthController.login);
+routes.get(`${prefix}/auth/spotify`, authenticate, AuthController.spotify);
 
 // Users
 routes.get(`${prefix}/users`, UsersController.search);
@@ -41,6 +42,8 @@ routes.delete(`${prefix}/albums/:albumId`, authenticate, AlbumsController.delete
 
 // Album Points
 routes.post(`${prefix}/points`, authenticate, AlbumPointController.create);
+ 
+
 
 
 export default routes;

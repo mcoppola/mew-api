@@ -14,21 +14,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/kylealwyn/node-rest-api-boilerplate.git"
+    "url": "git://github.com/mcoppola/mew-api.git"
   },
-  "keywords": [
-    "express",
-    "es6",
-    "restful",
-    "api"
-  ],
-  "author": "Kyle Alwyn <kjalwyn@gmail.com>",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/kylealwyn/node-rest-api-boilerplate/issues"
-  },
-  "homepage": "https://github.com/kylealwyn/node-rest-api-boilerplate",
+  "author": "Matthew Coppola <mcoppola832@gmail.com>",
   "dependencies": {
+    "axios": "*",
     "babel-core": "^6.18.0",
     "bcrypt": "^0.8.x",
     "body-parser": "^1.15.2",
@@ -42,7 +32,8 @@
     "mongoose": "^4.6.5",
     "morgan": "^1.7.0",
     "multer": "^1.2.0",
-    "ramda": "*"
+    "ramda": "*",
+    "spotify-web-api-node": "^2.4.0"
   },
   "devDependencies": {
     "babel-cli": "^6.18.0",
