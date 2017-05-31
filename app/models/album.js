@@ -30,6 +30,10 @@ const AlbumSchema = new Schema({
     // unqiue: true,
     // sparse: true
   },
+  spotifyId: {
+    type: String,
+    requred: false
+  },
   _user: { type: Schema.Types.ObjectId, ref: 'User' },
 }, {
   timestamps: true,
@@ -70,6 +74,9 @@ AlbumSchema.methods = {
   }
 }
 
+// Setting strength index to 2, makes values
+// case insensitive
+AlbumSchema.index({ title: 1, artist: 1 }, { strength: 2 });
 
 const AlbumModel = mongoose.model('Album', AlbumSchema)
 

@@ -6,7 +6,7 @@ import UsersController from './controllers/users.controller';
 import ListsController from './controllers/lists.controller';
 import AlbumsController from './controllers/albums.controller';
 import AlbumPointController from './controllers/albumPoint.controller';
-
+import SpotifyController from './controllers/spotify.controller';
 
 import authenticate from './middleware/authenticate';
 import constants from './config/constants';
@@ -18,7 +18,6 @@ routes.get(`${prefix}/`, MetaController.index);
 
 // Authentication
 routes.post(`${prefix}/auth/login`, AuthController.login);
-routes.get(`${prefix}/auth/spotify`, authenticate, AuthController.spotify);
 
 // Users
 routes.get(`${prefix}/users`, UsersController.search);
@@ -43,6 +42,10 @@ routes.delete(`${prefix}/albums/:albumId`, authenticate, AlbumsController.delete
 // Album Points
 routes.post(`${prefix}/points`, authenticate, AlbumPointController.create);
  
+// Spotify
+routes.get(`${prefix}/spotify/login`, authenticate, SpotifyController.login);
+routes.get(`${prefix}/spotify/top-tracks`, SpotifyController.topTracks);  // TODO: needs some kind of auth
+routes.get(`${prefix}/spotify/reauthorize`, SpotifyController.reauthorize);  // TODO: needs some kind of auth
 
 
 
