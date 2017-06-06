@@ -44,8 +44,8 @@ routes.post(`${prefix}/points`, authenticate, AlbumPointController.create);
  
 // Spotify
 routes.get(`${prefix}/spotify/login`, authenticate, SpotifyController.login);
-routes.get(`${prefix}/spotify/top-tracks`, SpotifyController.topTracks);  // TODO: needs some kind of auth
-routes.get(`${prefix}/spotify/reauthorize`, SpotifyController.reauthorize);  // TODO: needs some kind of auth
+routes.post(`${prefix}/spotify/add-top-tracks`, authenticate, SpotifyController.topTracks); 
+routes.get(`${prefix}/spotify/reauthorize`, authenticate, SpotifyController.reauthorize); 
 
 
 

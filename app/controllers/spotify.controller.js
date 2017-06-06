@@ -55,11 +55,11 @@ class SpotifyController extends BaseController {
   // Access token has expired. Use refresh token 
   // to apply for a new  access token.  
   reauthorize = (req, res) => {
-    if (!req.query.userId) {
+    if (!req.currentUser._id) {
       return res.sendStatus(401).json({ message: 'Missing userId param' })
     }
 
-    return User.findById(req.query.userId)
+    return User.findById(req.currentUser._id)
       .then( user => {
         if (!user.spotifyRefresh) {
           return res.sendStatus(403).json({ message: 'User is missing Spotify Refresh code' })
@@ -87,11 +87,11 @@ class SpotifyController extends BaseController {
   // Get's a user's top tracks from Spotify
   // and adds a point for each item
   topTracks = (req, res) => {
-    if (!req.query.userId) {
-      return res.sendStatus(401).json({ message: 'Missing userId param' })
+    if (!req.currentUser._id) {
+      return res.sendStatus(401).json({ message: 'Missing current user credentials' })
     }
 
-    User.findById(req.query.userId)
+    User.findById(req.currentUser._id)
       .then( user => {
           if (!user.spotifyAccess) {
             return res.sendStatus(401).json({ message: 'User has not authorized spotify' })
@@ -108,7 +108,7 @@ class SpotifyController extends BaseController {
 
             Promise.all(
               R.map(this._asocAlbum, data.body.items))
-            .then(albums => 
+            .then(albums =>
               Promise.all(
                 R.map(R.curry(this._createIfMissing)(user), albums)))
             .then(albums => 
@@ -116,7 +116,6 @@ class SpotifyController extends BaseController {
                 R.map(R.curry(this._addPoint)(user), albums)))
             
             .catch(err => console.log(err))
-
 
             return res.json(data.body)
           }, err => console.log(err))
@@ -143,7 +142,7 @@ class SpotifyController extends BaseController {
                 return Album.update(album, { spotifyId: spotifyTrack.id })
                   .then( album => {
                     return album
-                  }).catch(e => console.log)
+                  }).catch(err => console.log(err))
               } else {
                 // return spotifyTrack obj to be created later
                 return spotifyTrack
