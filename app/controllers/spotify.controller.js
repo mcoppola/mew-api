@@ -73,9 +73,9 @@ class SpotifyController extends BaseController {
           this.spotifyApi.setAccessToken(data.body['access_token'])
 
           return User.update(user, { spotifyAccess: data.body['access_token'] })
-            .then(() => {
-              return res.sendStatus(204);
-            })
+            .then(
+              res.status(200).json({ access_token: data.body['access_token']} )
+            )
             .catch( err  => res.status(400).json(this.formatApiError(err)))
         }, (err) => {
           console.log('Could not refresh access token', err);
@@ -90,66 +90,86 @@ class SpotifyController extends BaseController {
     if (!req.currentUser._id) {
       return res.sendStatus(401).json({ message: 'Missing current user credentials' })
     }
+    let user
 
     User.findById(req.currentUser._id)
-      .then( user => {
-          if (!user.spotifyAccess) {
-            return res.sendStatus(401).json({ message: 'User has not authorized spotify' })
-          }
+    .then( u => { 
+      user = u
+      return this._getTopTracks(u) 
+    })
+    .then( data => {
 
-          this.spotifyApi.setAccessToken(user.spotifyAccess)
-          this.spotifyApi.setRefreshToken(user.spotifyRefresh)
+        Promise.all(R.map(this._asocAlbum, data.body.items))
+        .then(albums => Promise.all(R.map(R.curry(this._createIfMissing)(user), albums)))
+        .then(albums => Promise.all(R.map(R.curry(this._addPoint)(user), albums)))
+        .catch(err => console.log(err))
 
-          this.spotifyApi.getMyTopTracks({ 
-            time_range: 'short_term',
-            limit: 10
-          })
-          .then( data => {
-
-            Promise.all(
-              R.map(this._asocAlbum, data.body.items))
-            .then(albums =>
-              Promise.all(
-                R.map(R.curry(this._createIfMissing)(user), albums)))
-            .then(albums => 
-              Promise.all(
-                R.map(R.curry(this._addPoint)(user), albums)))
-            
-            .catch(err => console.log(err))
-
-            return res.json(data.body)
-          }, err => console.log(err))
-          .catch( err => console.log(err) )
+        return res.json(data.body)
       })
       .catch( err => res.json(err));
+  }
+
+  _getTopTracks = (user) => {
+    return new Promise((resolve, reject) => {
+      if (!user.spotifyAccess) {
+        return reject('User has not authorized spotify')
+      }
+      this.spotifyApi.setAccessToken(user.spotifyAccess)
+      this.spotifyApi.setRefreshToken(user.spotifyRefresh)
+      this.spotifyApi.getMyTopTracks({ 
+        time_range: 'short_term',
+        limit: 10
+      })
+      .then(resolve)
+      .catch(reject)
+    })
   }
 
   // Associate a Spotify Track with an album
   // in the db
   _asocAlbum = (spotifyTrack) => {
-    // First, try to look up by spotify ID
-    return Album.findOne({ spotifyId: spotifyTrack.id })
+    return new Promise((resolve, reject) => {
+      // First, try to look up by spotify ID
+      this._findAlbumBySpotifyId( spotifyTrack.id )
       .then( album => {
         if (album) {
-          return album
+          resolve(album)
+        
         } else {
-
           // Second, try to find it by album title + artist name
-          return Album.findOne({ title: spotifyTrack.album.name, artist: spotifyTrack.artists[0].name })
+          this._findAlbumByTitleAndArtist( spotifyTrack.album.name, spotifyTrack.artists[0].name )
             .then( album => {
               if (album) {
                 // Add spotify ID to Album 
-                return Album.update(album, { spotifyId: spotifyTrack.id })
+                Album.update(album, { spotifyId: spotifyTrack.id })
                   .then( album => {
-                    return album
-                  }).catch(err => console.log(err))
+                    resolve(album)
+                  })
+                  .catch(reject)
               } else {
                 // return spotifyTrack obj to be created later
-                return spotifyTrack
+                resolve(spotifyTrack)
               }
             })
         }
-      })
+        })
+    })
+  }
+
+  _findAlbumBySpotifyId = (id) => {
+    return new Promise((resolve, reject) => {
+      Album.findOne({ spotifyId: id })
+      .then(resolve)
+      .catch(reject)
+    })
+  }
+
+  _findAlbumByTitleAndArtist = (title, artist) => {
+    return new Promise((resolve, reject) => {
+      Album.findOne({ title, artist })
+      .then(resolve)
+      .catch(reject)
+    })
   }
 
   _createIfMissing = (_user, album) => {
