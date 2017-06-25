@@ -50,20 +50,7 @@ const AlbumSchema = new Schema({
 /**
  * Album 'now' Points calculation
  */
-// const pointsNow =
-//   R.pipe(
-//     R.filter(p => {
-//       let timestamp = new Date(p.createdAt).getTime()
-//       let cutoff = Date.now() - points.time.upvote
-//       return timestamp >= cutoff
-//     }),
-//     R.pluck('value'),
-//     R.sum
-//   )
-/**
- * Album 'now' Points calculation 2.0
- * Adds combined time values
- */
+
 const pointsNow =
   R.pipe(
     R.filter(p => {
@@ -74,13 +61,6 @@ const pointsNow =
     R.pluck('value'),
     R.sum
   )
-
-// 1. 1:00pm     +1 until 2pm
-// 2. 1:05pm     +1 until 2:05pm
-
-//    * 1hr
-//  
-//  = 3:00pm 
 
 
 /**

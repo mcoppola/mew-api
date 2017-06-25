@@ -10,7 +10,7 @@ class UsersController extends BaseController {
     this.update = this.update.bind(this);
     this.delete = this.delete.bind(this);
 
-    this.whitelist = ['firstname', 'lastname', 'email', 'username', 'password', 'spotifyAccess', 'spotifyRefresh'];
+    this.whitelist = ['firstname', 'lastname', 'email', 'username', 'password', 'spotifyAccess', 'spotifyRefresh', 'profilePicture'];
   }
 
   _populate(req, res, next) {

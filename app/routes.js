@@ -23,6 +23,7 @@ routes.post(`${prefix}/auth/login`, AuthController.login);
 routes.get(`${prefix}/users`, UsersController.search);
 routes.post(`${prefix}/users`, UsersController.create);
 routes.get(`${prefix}/users/me`, authenticate, UsersController.fetch);
+routes.get(`${prefix}/users/points`, authenticate, AlbumPointController.mine);
 routes.put(`${prefix}/users/me`, authenticate, UsersController.update);
 routes.delete(`${prefix}/users/me`, authenticate, UsersController.delete);
 routes.get(`${prefix}/users/:username`, UsersController._populate, UsersController.fetch)
