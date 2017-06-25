@@ -30,7 +30,7 @@ const UserSchema = new Schema({
     type: String,
     required: [true, 'Password is required.'],
   },
-  profilePicture: {
+  profileImage: {
     type: String,
     default: 'http://www.sessionlogs.com/media/icons/defaultIcon.png'
   },

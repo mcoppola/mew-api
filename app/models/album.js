@@ -42,6 +42,9 @@ const AlbumSchema = new Schema({
     type: String,
     required: false
   },
+  pointsUsers: {
+    type: [{ type: Schema.Types.ObjectId, ref: 'User' }]
+  },
   _user: { type: Schema.Types.ObjectId, ref: 'User' },
 }, {
   timestamps: true,
@@ -62,6 +65,16 @@ const pointsNow =
     R.sum
   )
 
+/**
+ * Extract users from Points
+ */
+const pointsUsers = 
+  R.pipe(
+    R.map(p => p._user),
+    R.uniqBy(u => u.username)
+  )
+
+
 
 /**
  * Album Methods
@@ -71,12 +84,15 @@ AlbumSchema.methods = {
     return new Promise((resolve, reject) => {
       AlbumPoint
       .find({ album: this._id })
+      .populate('_user', ['username', 'profileImage'])
       .then(points => 
         resolve({ 
           // total points 
           pointsTotal: R.sum(R.pluck('value', points)),
           // weighted "now" points
-          pointsNow: pointsNow(points)
+          pointsNow: pointsNow(points),
+          // users who have voted
+          pointsUsers: pointsUsers(points)
         })
       )
       .catch(reject)

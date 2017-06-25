@@ -1,4 +1,4 @@
-import BaseController from './base.controller';
+  import BaseController from './base.controller';
 import Album from '../models/album';
 import * as R from 'ramda';
 
@@ -38,7 +38,7 @@ class AlbumController extends BaseController {
   search = (req, res) => {
     Album
       .find(req.query.q ? JSON.parse(req.query.q) : {}, { skip: req.query.skip*10 || 0 })
-      .populate({ path: '_user', select: '-album -role' })
+      .populate('_user', ['username', 'profileImage'])
       .then((albums) => {
         // merge albums with point sums
         Promise.all(R.map(this.getPoints, albums))
@@ -46,7 +46,7 @@ class AlbumController extends BaseController {
 
             // sort and apply limit
             let topAlbums = R.reverse(
-                            R.sortBy(R.prop('pointsNow'), withPoints))
+                              R.sortBy(R.prop('pointsNow'), withPoints))
                             .slice(0, req.query.limit || 10)
 
             res.status(200).json(topAlbums);
