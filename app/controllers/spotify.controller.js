@@ -52,6 +52,8 @@ class SpotifyController extends BaseController {
         )
   }
 
+  // POST /spotify/reathorize
+  //
   // Access token has expired. Use refresh token 
   // to apply for a new  access token.  
   reauthorize = (req, res) => {
@@ -68,7 +70,6 @@ class SpotifyController extends BaseController {
         this.spotifyApi.setRefreshToken(user.spotifyRefresh)
         this.spotifyApi.refreshAccessToken()
         .then( data => {
-
           // Save the access token so that it's used in future calls
           this.spotifyApi.setAccessToken(data.body['access_token'])
 
@@ -80,6 +81,29 @@ class SpotifyController extends BaseController {
         }, (err) => {
           console.log('Could not refresh access token', err);
         })
+    })
+  }
+
+  _reauthorize = (user) => {
+    return new Promise((resolve, reject) => {
+      if (!user.spotifyRefresh) {
+        reject('User is missing spoitfy credentials')
+      }
+      this.spotifyApi.setRefreshToken(user.spotifyRefresh)
+
+      this.spotifyApi.refreshAccessToken()
+        .then( data => {
+          // Save the access token so that it's used in future calls
+          this.spotifyApi.setAccessToken(data.body['access_token'])
+          let newUser = user
+          newUser.spotifyAccess = data.body['access_token']
+          User.update(user, { spotifyAccess: data.body['access_token'] })
+            .then(u => resolve(newUser))
+            .catch( err  => reject(this.formatApiError(err)))
+
+        }, (err) => 
+          reject('Could not refresh access token', err)
+        )
     })
   }
 
@@ -95,7 +119,7 @@ class SpotifyController extends BaseController {
     User.findById(req.currentUser._id)
     .then( u => { 
       user = u
-      return this._getTopTracks(u) 
+      return this._getTopTracks(u)
     })
     .then( data => {
 
@@ -107,6 +131,40 @@ class SpotifyController extends BaseController {
         return res.json(data.body)
       })
       .catch( err => res.json(err));
+  }
+
+  // GET /spotify/all-top-tracks  (root)
+  //
+  // Calculates all users top tracks from Spoitfy
+  // and adds points for each item
+  allTopTracks = (req, res) => {
+
+    User.find({})
+      .then( users => {
+        Promise.all(R.map(
+          u => 
+          new Promise((resolve, reject) => {
+            this._reauthorize(u)
+            .then(this._getTopTracks)
+            .then( data => {
+                Promise.all(R.map(this._asocAlbum, data.body.items))
+                  .then( albums => Promise.all(R.map(R.curry(this._createIfMissing)(u), albums)))
+                  .then( albums => Promise.all(R.map(R.curry(this._addPoint)(u), albums)))
+                  .then( res => { 
+                    resolve(data.body.items)
+                  })
+                  .catch(err => { 
+                    reject(err)
+                  })
+              })
+              .catch( err => reject(err))
+              // Only users who have authorized spotify
+          }), users.filter(u => !!u.spotifyAccess )))
+        .then(response => {
+          res.json(respose)
+        })
+        .catch(err => res.json(err))
+      })
   }
 
   _getTopTracks = (user) => {
@@ -134,7 +192,6 @@ class SpotifyController extends BaseController {
       .then( album => {
         if (album) {
           resolve(album)
-        
         } else {
           // Second, try to find it by album title + artist name
           this._findAlbumByTitleAndArtist( spotifyTrack.album.name, spotifyTrack.artists[0].name )
@@ -142,7 +199,7 @@ class SpotifyController extends BaseController {
               if (album) {
                 // Add spotify ID to Album 
                 Album.update(album, { spotifyId: spotifyTrack.id })
-                  .then( album => {
+                  .then( ok => {
                     resolve(album)
                   })
                   .catch(reject)
@@ -173,28 +230,35 @@ class SpotifyController extends BaseController {
   }
 
   _createIfMissing = (_user, album) => {
-    // First, make sure it's a spotify track obj
-    if (album.uri && album.uri.indexOf('spotify:') > -1) {
-
-      return Album.create({
-        title: album.album.name,
-        artist: album.artists[0].name,
-        image: album.album.images.map(i => i.url),
-        _user, _user
-      }).then(album => { return album })
-
-    } else {
-      // not a spotify track obj, return it
-      return album
-    }
+    return new Promise((resolve, reject) => {
+      // First, make sure it's a spotify track obj
+      if (album.uri && album.uri.indexOf('spotify:') > -1) {
+        Album.create({
+          title: album.album.name,
+          artist: album.artists[0].name,
+          image: album.album.images.map(i => i.url),
+          _user, _user
+        })
+        .then(album => resolve(album) )
+        .catch(e => reject(e))
+      } else {
+        // not a spotify track obj, return it
+        resolve(album)
+      }
+    })
   }
 
   _addPoint = (_user, album) => {
-    const albumPoint = new AlbumPoint({ album: album._id, _user: _user._id });
-    albumPoint.value = points.values['spotifyTopTrack']
-    albumPoint.action = 'spotifyTopTrack'
+    return new Promise((resolve, reject) => {
+      console.log('POINTS for: ' + _user.username + ' ' + album.title);
+      const albumPoint = new AlbumPoint({ album: album._id, _user: _user._id });
+      albumPoint.value = points.values['spotifyTopTrack']
+      albumPoint.action = 'spotifyTopTrack'
 
-    return albumPoint.save()
+      albumPoint.save()
+        .then(ok => resolve(album))
+        .catch(e => reject(e))
+    })
   }
 }
 

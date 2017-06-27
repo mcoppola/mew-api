@@ -8,7 +8,7 @@ import AlbumsController from './controllers/albums.controller';
 import AlbumPointController from './controllers/albumPoint.controller';
 import SpotifyController from './controllers/spotify.controller';
 
-import authenticate from './middleware/authenticate';
+import { authenticate, authenticateRoot } from './middleware/authenticate';
 import constants from './config/constants';
 
 const routes = new Router();
@@ -47,6 +47,8 @@ routes.post(`${prefix}/points`, authenticate, AlbumPointController.create);
 routes.get(`${prefix}/spotify/login`, authenticate, SpotifyController.login);
 routes.post(`${prefix}/spotify/add-top-tracks`, authenticate, SpotifyController.topTracks); 
 routes.get(`${prefix}/spotify/reauthorize`, authenticate, SpotifyController.reauthorize); 
+routes.get(`${prefix}/spotify/all-top-tracks`, authenticateRoot, SpotifyController.allTopTracks); 
+
 
 
 

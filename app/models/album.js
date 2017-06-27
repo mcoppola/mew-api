@@ -27,19 +27,17 @@ const AlbumSchema = new Schema({
   fmUrl: {  
     type: String,
     required: false,
-    // unqiue: true,
-    // sparse: true
   },
   spotifyId: {
     type: String,
     requred: false
   },
   pointsNow: { 
-    type: String,
+    type: Number,
     required: false
   },
   pointsTotal: { 
-    type: String,
+    type: Number,
     required: false
   },
   pointsUsers: {

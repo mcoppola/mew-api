@@ -4,7 +4,7 @@ import Constants from '../config/constants';
 
 const { sessionSecret } = Constants.security;
 
-export default function authenticate(req, res, next) {
+export const authenticate = (req, res, next) => {
   const { authorization } = req.headers;
   jwt.verify(authorization, sessionSecret, (err, decoded) => {
     if (err) {
@@ -23,4 +23,13 @@ export default function authenticate(req, res, next) {
       })
       .catch((err) => next(err));
   });
+}
+
+export const authenticateRoot = (req, res, next) => {
+  // TODO: root user
+  if (req.query.key === 'foobar') {
+    next()
+  } else {
+    return res.sendStatus(401)
+  }
 }
