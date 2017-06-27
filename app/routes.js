@@ -39,6 +39,7 @@ routes.get(`${prefix}/albums`, AlbumsController.search);
 routes.post(`${prefix}/albums`, authenticate, AlbumsController.create);
 routes.get(`${prefix}/albums/:albumId`, AlbumsController._populate, AlbumsController.fetch);
 routes.delete(`${prefix}/albums/:albumId`, authenticate, AlbumsController.delete);
+routes.get(`${prefix}/albums/user/:userId`, AlbumsController.searchByUserPoints);
 
 // Album Points
 routes.post(`${prefix}/points`, authenticate, AlbumPointController.create);

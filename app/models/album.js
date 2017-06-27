@@ -3,6 +3,8 @@ import AlbumPoint from './albumPoint'
 import * as R from 'ramda'
 import points from '../config/points'
 
+import { pointsNow, pointsUsers } from '../lib/points'
+
 const Schema = mongoose.Schema
 
 const AlbumSchema = new Schema({
@@ -48,30 +50,6 @@ const AlbumSchema = new Schema({
   timestamps: true,
 })
 
-/**
- * Album 'now' Points calculation
- */
-
-const pointsNow =
-  R.pipe(
-    R.filter(p => {
-      let timestamp = new Date(p.createdAt).getTime()
-      let cutoff = Date.now() - points.time.upvote
-      return timestamp >= cutoff
-    }),
-    R.pluck('value'),
-    R.sum
-  )
-
-/**
- * Extract users from Points
- */
-const pointsUsers = 
-  R.pipe(
-    R.map(p => p._user),
-    R.uniqBy(u => u.username)
-  )
-
 
 
 /**
@@ -84,6 +62,24 @@ AlbumSchema.methods = {
       .find({ album: this._id })
       .populate('_user', ['username', 'profileImage'])
       .then(points => 
+        resolve({ 
+          // total points 
+          pointsTotal: R.sum(R.pluck('value', points)),
+          // weighted "now" points
+          pointsNow: pointsNow(points),
+          // users who have voted
+          pointsUsers: pointsUsers(points)
+        })
+      )
+      .catch(reject)
+    })
+  },
+  getUserPoints(user) {
+    return new Promise((resolve, reject) => {
+      AlbumPoint
+      .find({ album: this._id, _user: user })
+      .populate('_user', ['username', 'profileImage'])
+      .then(points =>
         resolve({ 
           // total points 
           pointsTotal: R.sum(R.pluck('value', points)),

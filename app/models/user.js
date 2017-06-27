@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import Constants from '../config/Constants';
 
+
 const Schema = mongoose.Schema;
 const UserSchema = new Schema({
   firstname: String,

@@ -1,4 +1,5 @@
-  import BaseController from './base.controller';
+import BaseController from './base.controller';
+import User from '../models/user';
 import Album from '../models/album';
 import * as R from 'ramda';
 
@@ -35,15 +36,25 @@ class AlbumController extends BaseController {
     })
   }
 
+  getUserPoints (user, album) {
+    return new Promise((resolve, reject) => {
+      album.getUserPoints(user)
+        .then(p => {
+          album.set(p)
+          return resolve(album)
+        })
+        .catch(reject)
+    })
+  }
+
   search = (req, res) => {
     Album
       .find(req.query.q ? JSON.parse(req.query.q) : {}, { skip: req.query.skip*10 || 0 })
       .populate('_user', ['username', 'profileImage'])
       .then((albums) => {
         // merge albums with point sums
-        Promise.all(R.map(this.getPoints, albums))
+        Promise.all(R.map(req.query.userId ? this.getPointsByUser(user) : this.getPoints, albums))
           .then( withPoints => {
-
             // sort and apply limit
             let topAlbums = R.reverse(
                               R.sortBy(R.prop('pointsNow'), withPoints))
@@ -56,6 +67,61 @@ class AlbumController extends BaseController {
         res.status(500).json(this.formatApiError(err));
       });
   }
+
+  searchByUserPoints = (req, res) => {
+    if (!req.params.userId) {
+      return res.status(500).json({ message: 'no user id provided' })
+    }
+    Album
+      .find(req.query.q ? JSON.parse(req.query.q) : {}, { skip: req.query.skip*10 || 0 })
+      .populate('_user', ['username', 'profileImage'])
+      .then((albums) => {
+        // merge albums with point sums
+        Promise.all(R.map(R.curry(this.getUserPoints)(req.params.userId), albums))
+          .then( withPoints => {
+            // sort and apply limit
+            let topAlbums = R.reverse(
+                              R.sortBy(R.prop('pointsNow'), withPoints))
+                            .slice(0, req.query.limit || 10)
+
+            res.status(200).json(topAlbums);
+          })
+      })
+      .catch((err) => {
+        res.status(500).json(this.formatApiError(err));
+      });
+  }
+
+  // userTopAlbums = (req, res) => {
+  //   if (!req.params.userId) {
+  //     res.status(500).json({ message: 'no user id' })
+  //   }
+  //   User
+  //     .findOne({ _id: req.params.userId })
+  //     .populate('_user', ['username', 'profileImage'])
+  //     .then((user) => {
+  //       console.log('user');
+  //       console.log(user);
+  //       // get uesr's created points
+  //       this.getUserPoints(user)
+  //         .then( points => {
+  //           console.log('points', points)
+  //           // sort and apply limit
+  //           let topAlbums = R.reverse(
+  //                             R.sortBy(R.prop('pointsNow'), points))
+  //                           .slice(0, req.query.limit || 10)
+
+  //           res.status(200).json(topAlbums);
+  //         })
+  //         .catch(e => {
+  //           console.log('err',e);
+  //           res.status(500).json(e)
+  //         })
+  //     })
+  //     .catch((err) => {
+  //       res.status(500).json(this.formatApiError(err));
+  //     });
+  // }
 
   /**
   * req.album is populated by middleware in routes.js
