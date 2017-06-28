@@ -1,5 +1,5 @@
 import * as R from 'ramda'
-import points from '../config/points'
+import config from '../config/points'
 
 /**
  * Points 'now' calculation
@@ -8,7 +8,7 @@ export const pointsNow =
   R.pipe(
     R.filter(p => {
       let timestamp = new Date(p.createdAt).getTime()
-      let cutoff = Date.now() - points.time.upvote
+      let cutoff = Date.now() - config.points.time.upvote
       return timestamp >= cutoff
     }),
     R.pluck('value'),

@@ -24,9 +24,11 @@ routes.get(`${prefix}/users`, UsersController.search);
 routes.post(`${prefix}/users`, UsersController.create);
 routes.get(`${prefix}/users/me`, authenticate, UsersController.fetch);
 routes.get(`${prefix}/users/points`, authenticate, AlbumPointController.mine);
+routes.get(`${prefix}/users/dollars`, authenticate, AlbumPointController.myDollars);
 routes.put(`${prefix}/users/me`, authenticate, UsersController.update);
 routes.delete(`${prefix}/users/me`, authenticate, UsersController.delete);
 routes.get(`${prefix}/users/:username`, UsersController._populate, UsersController.fetch)
+
 
 // List
 routes.get(`${prefix}/lists`, ListsController.search);
@@ -43,6 +45,7 @@ routes.get(`${prefix}/albums/user/:userId`, AlbumsController.searchByUserPoints)
 
 // Album Points
 routes.post(`${prefix}/points`, authenticate, AlbumPointController.create);
+
  
 // Spotify
 routes.get(`${prefix}/spotify/login`, authenticate, SpotifyController.login);
