@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import Constants from '../config/Constants';
+import Constants from '../config/constants';
 
 
 const Schema = mongoose.Schema;

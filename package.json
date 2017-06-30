@@ -20,6 +20,7 @@
   "dependencies": {
     "axios": "*",
     "babel-core": "^6.18.0",
+    "babel-preset-stage-2": "latest",
     "bcrypt": "^0.8.x",
     "body-parser": "^1.15.2",
     "cors": "^2.8.1",

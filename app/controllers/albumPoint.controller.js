@@ -5,7 +5,6 @@ import * as R from 'ramda';
 import config from '../config/points'
 
 
-
 class AlbumPointController extends BaseController {
   constructor() {
     super();
