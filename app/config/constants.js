@@ -50,6 +50,9 @@ const environmentConfigs = {
     security: {
       saltRounds: 4,
     },
+    spotify: {
+      callback: 'http://localhost:3000/spotify-callback'
+    }
   },
   test: {
     port: 5678,
@@ -65,6 +68,9 @@ const environmentConfigs = {
       seed: false,
       uri: process.env.MONGO_URI,
     },
+    spotify: {
+      callback: 'http://alpha.mattcoppola.com/spotify-callback'
+    }
   },
 };
 

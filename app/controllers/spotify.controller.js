@@ -5,13 +5,14 @@ import User from '../models/user';
 import Album from '../models/album';
 import AlbumPoint from '../models/albumPoint';
 import points from '../config/points';
+import constants from '../config/constants'
 import * as R from 'ramda';
 
 
 // Spotify app credentials (mew-dev)
 const clientId = '24ff5979c65f4eff8b7ece06329d8afc'
 const clientSecret = 'b20a6499e02642e6b2449827da0288d1'
-const redirectUri = 'http://localhost:3000/spotify-callback'
+const redirectUri = constants.spotify.callback
 const scopes = ['user-read-private', 'user-read-email', 'user-top-read']
 
 
@@ -50,6 +51,7 @@ class SpotifyController extends BaseController {
         ,
         err => res.status(500).json(err)
         )
+      .catch(err => res.status(500).json(err))
   }
 
   // POST /spotify/reathorize
