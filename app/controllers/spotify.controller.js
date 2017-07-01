@@ -4,7 +4,8 @@ import SpotifyWebApi from 'spotify-web-api-node'
 import User from '../models/user';
 import Album from '../models/album';
 import AlbumPoint from '../models/albumPoint';
-import points from '../config/points';
+
+import config from '../config/points';
 import constants from '../config/constants'
 import * as R from 'ramda';
 
@@ -254,7 +255,7 @@ class SpotifyController extends BaseController {
     return new Promise((resolve, reject) => {
       console.log('POINTS for: ' + _user.username + ' ' + album.title);
       const albumPoint = new AlbumPoint({ album: album._id, _user: _user._id });
-      albumPoint.value = points.values['spotifyTopTrack']
+      albumPoint.value = config.points.values['spotifyTopTrack']
       albumPoint.action = 'spotifyTopTrack'
 
       albumPoint.save()
