@@ -27,7 +27,7 @@ export const authenticate = (req, res, next) => {
 
 export const authenticateRoot = (req, res, next) => {
   // TODO: root user
-  if (req.query.key === 'foobar') {
+  if (req.query.key === 'EBDEj9@qK&bGqnRs') {
     next()
   } else {
     return res.sendStatus(401)
