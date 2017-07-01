@@ -69,7 +69,7 @@ const environmentConfigs = {
       uri: process.env.MONGO_URI,
     },
     spotify: {
-      callback: 'http://alpha.mattcoppola.com/spotify-callback'
+      callback: 'https://alpha.mattcoppola.com/spotify-callback'
     }
   },
 };
