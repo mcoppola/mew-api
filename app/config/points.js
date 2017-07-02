@@ -17,7 +17,8 @@ const config = {
 
 	dollars: {
 		// 1$ per growRate
-		growRate: 1000*60*60, // 1 hour
+		// growRate: 1000*60*60, // 1 hour
+		growRate: 1000*60*60*(24/10), // 10 per day
 
 		startAmount: 10,
 
